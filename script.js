@@ -5,19 +5,21 @@ const grid = 15;
 let snake = [{ x: 5, y: 5 }];
 let food = randomFood();
 let dir = { x: 1, y: 0 };
+let nextDir = { x: 1, y: 0 };
 let score = 0;
 
-const buttons = document.querySelectorAll(".controls button");
-buttons.forEach(btn => {
+/* ================= CONTROLS ================= */
+document.querySelectorAll(".controls button").forEach(btn => {
   btn.addEventListener("click", () => {
     const d = btn.dataset.dir;
-    if (d === "left" && dir.x !== 1) dir = { x: -1, y: 0 };
-    if (d === "right" && dir.x !== -1) dir = { x: 1, y: 0 };
-    if (d === "up" && dir.y !== 1) dir = { x: 0, y: -1 };
-    if (d === "down" && dir.y !== -1) dir = { x: 0, y: 1 };
+    if (d === "left" && dir.x !== 1) nextDir = { x: -1, y: 0 };
+    if (d === "right" && dir.x !== -1) nextDir = { x: 1, y: 0 };
+    if (d === "up" && dir.y !== 1) nextDir = { x: 0, y: -1 };
+    if (d === "down" && dir.y !== -1) nextDir = { x: 0, y: 1 };
   });
 });
 
+/* ================= FOOD ================= */
 function randomFood() {
   return {
     x: Math.floor(Math.random() * (canvas.width / grid)),
@@ -25,11 +27,39 @@ function randomFood() {
   };
 }
 
+function drawHeart(x, y, size) {
+  ctx.fillStyle = "#ff4d6d";
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(
+    x - size,
+    y - size,
+    x - size * 2,
+    y + size / 2,
+    x,
+    y + size * 2
+  );
+  ctx.bezierCurveTo(
+    x + size * 2,
+    y + size / 2,
+    x + size,
+    y - size,
+    x,
+    y
+  );
+  ctx.fill();
+}
+
+/* ================= SNAKE ================= */
 function drawSnake() {
-  // Body
-  ctx.strokeStyle = "#ff6b81";
   ctx.lineWidth = grid;
   ctx.lineCap = "round";
+
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, "#ff4d6d");
+  gradient.addColorStop(1, "#ff9aa2");
+
+  ctx.strokeStyle = gradient;
   ctx.beginPath();
 
   snake.forEach((p, i) => {
@@ -41,9 +71,9 @@ function drawSnake() {
   ctx.stroke();
 
   // Head
-  const head = snake[0];
-  const hx = head.x * grid + grid / 2;
-  const hy = head.y * grid + grid / 2;
+  const h = snake[0];
+  const hx = h.x * grid + grid / 2;
+  const hy = h.y * grid + grid / 2;
 
   ctx.fillStyle = "#ff4d6d";
   ctx.beginPath();
@@ -56,37 +86,20 @@ function drawSnake() {
   ctx.arc(hx - 3, hy - 3, 2, 0, Math.PI * 2);
   ctx.arc(hx + 3, hy - 3, 2, 0, Math.PI * 2);
   ctx.fill();
-
-  // Tongue
-  ctx.strokeStyle = "#ff0000";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(hx, hy + 5);
-  ctx.lineTo(hx, hy + 10);
-  ctx.stroke();
 }
 
-function drawFood() {
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.arc(
-    food.x * grid + grid / 2,
-    food.y * grid + grid / 2,
-    grid / 3,
-    0,
-    Math.PI * 2
-  );
-  ctx.fill();
-}
-
+/* ================= GAME LOOP ================= */
 function update() {
+  dir = nextDir;
+
   const head = {
     x: snake[0].x + dir.x,
     y: snake[0].y + dir.y
   };
 
   if (
-    head.x < 0 || head.y < 0 ||
+    head.x < 0 ||
+    head.y < 0 ||
     head.x >= canvas.width / grid ||
     head.y >= canvas.height / grid ||
     snake.some(p => p.x === head.x && p.y === head.y)
@@ -108,7 +121,13 @@ function update() {
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawFood();
+
+  drawHeart(
+    food.x * grid + grid / 2,
+    food.y * grid + grid / 2,
+    grid / 3
+  );
+
   drawSnake();
   update();
 }
@@ -119,15 +138,51 @@ function endGame() {
   document.getElementById("valentine").style.display = "block";
 }
 
-// Valentine logic
+/* ================= CONFETTI ================= */
+function launchConfetti() {
+  const confetti = document.createElement("canvas");
+  confetti.id = "confetti";
+  document.body.appendChild(confetti);
+
+  confetti.width = window.innerWidth;
+  confetti.height = window.innerHeight;
+
+  const cctx = confetti.getContext("2d");
+
+  const pieces = Array.from({ length: 180 }, () => ({
+    x: Math.random() * confetti.width,
+    y: Math.random() * confetti.height - confetti.height,
+    r: Math.random() * 6 + 4,
+    d: Math.random() * 6 + 3,
+    color: `hsl(${Math.random() * 360}, 100%, 70%)`
+  }));
+
+  function animate() {
+    cctx.clearRect(0, 0, confetti.width, confetti.height);
+    pieces.forEach(p => {
+      cctx.fillStyle = p.color;
+      cctx.beginPath();
+      cctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      cctx.fill();
+      p.y += p.d;
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+/* ================= VALENTINE ================= */
 document.getElementById("yesBtn").onclick = () => {
-  alert("YAY 🐍💖 We slithered into love.");
+  launchConfetti();
+  document.getElementById("valentine").innerHTML = `
+    <h2>YEEEY! thank you baby!! hehehe 💖🐍</h2>
+  `;
 };
 
 document.getElementById("noBtn").onmouseover = () => {
   const btn = document.getElementById("noBtn");
-  btn.style.left = Math.random() * 120 - 60 + "px";
-  btn.style.top = Math.random() * 120 - 60 + "px";
+  btn.style.left = Math.random() * 140 - 70 + "px";
+  btn.style.top = Math.random() * 100 - 50 + "px";
 };
 
-let loop = setInterval(draw, 180);
+let loop = setInterval(draw, 160);
