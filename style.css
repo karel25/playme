@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #ffe6eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#gameContainer,
+#valentine {
+  text-align: center;
+}
+
+canvas {
+  background: #fff;
+  border: 3px solid #ff4d6d;
+  border-radius: 12px;
+}
+
+h1, h2 {
+  color: #ff4d6d;
+}
+
+.controls {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 5px;
+  justify-content: center;
+}
+
+.controls button {
+  padding: 10px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ff4d6d;
+  color: white;
+}
+
+#valentine {
+  display: none;
+}
+
+.val-btns button {
+  padding: 12px 25px;
+  font-size: 18px;
+  margin: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#yesBtn {
+  background: #ff4d6d;
+  color: white;
+}
+
+#noBtn {
+  background: #ccc;
+  position: relative;
+}
