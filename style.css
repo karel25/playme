@@ -12,26 +12,30 @@ body {
   align-items: center;
 }
 
-#gameContainer,
-#valentine {
+/* ================= GAME ================= */
+
+#gameContainer {
   text-align: center;
 }
 
 canvas {
-  background: #fff;
+  background: #ffffff;
   border: 3px solid #ff4d6d;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
-h1, h2 {
+h1,
+h2 {
   color: #ff4d6d;
+  margin-bottom: 10px;
 }
 
+/* Mobile controls */
 .controls {
-  margin-top: 10px;
+  margin-top: 12px;
   display: grid;
   grid-template-columns: repeat(3, 60px);
-  gap: 5px;
+  gap: 6px;
   justify-content: center;
 }
 
@@ -39,30 +43,46 @@ h1, h2 {
   padding: 10px;
   font-size: 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #ff4d6d;
   color: white;
 }
+
+/* ================= VALENTINE ================= */
 
 #valentine {
   display: none;
+  text-align: center;
 }
 
+/* Button container */
+.val-btns {
+  position: relative;
+  height: 140px;
+  margin-top: 20px;
+}
+
+/* Shared button styles */
 .val-btns button {
-  padding: 12px 25px;
+  padding: 14px 28px;
   font-size: 18px;
-  margin: 10px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
 }
 
+/* YES button (always clickable) */
 #yesBtn {
   background: #ff4d6d;
   color: white;
+  position: relative;
+  z-index: 10;
 }
 
+/* NO button (escapes but stays contained) */
 #noBtn {
-  background: #ccc;
-  position: relative;
+  background: #cccccc;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
